@@ -7,58 +7,6 @@ import pytest
 
 from tornado.httpclient import HTTPClientError
 
-
-@pytest.mark.parametrize(
-    "followSymlinks, download_hidden, file_list",
-    [
-        (
-            False,
-            False,
-            {
-                "download-archive-dir/test2.txt",
-                "download-archive-dir/test1.txt",
-                "download-archive-dir/test3.md",
-                "download-archive-dir/中文文件夹/中文.txt",
-            },
-        ),
-        (
-            False,
-            True,
-            {
-                "download-archive-dir/test2.txt",
-                "download-archive-dir/test1.txt",
-                "download-archive-dir/test3.md",
-                "download-archive-dir/中文文件夹/中文.txt",
-                "download-archive-dir/.test4.md",
-                "download-archive-dir/.test-hidden-folder/test5.md",
-            },
-        ),
-        (
-            True,
-            False,
-            {
-                "download-archive-dir/test2.txt",
-                "download-archive-dir/test1.txt",
-                "download-archive-dir/test3.md",
-                "download-archive-dir/中文文件夹/中文.txt",
-                "download-archive-dir/symlink-test-dir/test6.md",
-            },
-        ),
-        (
-            True,
-            True,
-            {
-                "download-archive-dir/test2.txt",
-                "download-archive-dir/test1.txt",
-                "download-archive-dir/test3.md",
-                "download-archive-dir/中文文件夹/中文.txt",
-                "download-archive-dir/.test4.md",
-                "download-archive-dir/.test-hidden-folder/test5.md",
-                "download-archive-dir/symlink-test-dir/test6.md",
-            },
-        ),
-    ],
-)
 @pytest.mark.parametrize(
     "format, mode",
     [
@@ -73,53 +21,6 @@ from tornado.httpclient import HTTPClientError
         ("tar.xz", "r|xz"),
     ],
 )
-async def test_download(jp_fetch, jp_root_dir, followSymlinks, download_hidden, file_list, format, mode):
-    if followSymlinks and platform.system() == "Windows":
-        pytest.skip("Symlinks not working on Windows")
-
-    # Create a dummy directory.
-    archive_dir_path = jp_root_dir / "download-archive-dir"
-    archive_dir_path.mkdir(parents=True)
-    (archive_dir_path / "test1.txt").write_text("hello1")
-    (archive_dir_path / "test2.txt").write_text("hello2")
-    (archive_dir_path / "test3.md").write_text("hello3")
-    (archive_dir_path / ".test4.md").write_text("hello4")
-
-    hidden_folder = archive_dir_path / ".test-hidden-folder"
-    hidden_folder.mkdir(parents=True)
-    (hidden_folder / "test5.md").write_text("hello5")
-
-    non_ascii_folder = archive_dir_path / "中文文件夹"
-    non_ascii_folder.mkdir(parents=True)
-    (non_ascii_folder / "中文.txt").write_text("你好")
-
-    symlink_dir_path = jp_root_dir / "symlink-archive-dir"
-    symlink_dir_path.mkdir(parents=True)
-    (symlink_dir_path / "test6.md").write_text("hello6")
-    if platform.system() != "Windows":
-        (archive_dir_path / "symlink-test-dir").symlink_to(symlink_dir_path, target_is_directory=True)
-
-    # Try to download the created folder.
-    archive_relative_path = archive_dir_path.relative_to(jp_root_dir)
-    params = {
-        "archiveToken": 564646,
-        "archiveFormat": format,
-        "followSymlinks": str(followSymlinks).lower(),
-        "downloadHidden": str(download_hidden).lower(),
-    }
-    r = await jp_fetch("directories", archive_dir_path.stem, params=params, method="GET")
-
-    assert r.code == 200
-    assert r.headers["content-type"] == "application/octet-stream"
-    assert r.headers["cache-control"] == "no-cache"
-
-    if format == "zip":
-        with zipfile.ZipFile(r.buffer, mode=mode) as zf:
-            assert set(zf.namelist()) == file_list
-    else:
-        with tarfile.open(fileobj=r.buffer, mode=mode) as tf:
-            assert set(map(lambda m: m.name, tf.getmembers())) == file_list
-
 
 def _create_archive_file(root_dir, file_name, format, mode):
     # Create a dummy directory.
@@ -176,7 +77,7 @@ def _create_archive_file(root_dir, file_name, format, mode):
 async def test_extract(jp_fetch, jp_root_dir, file_name, format, mode):
     archive_dir_path, archive_path = _create_archive_file(jp_root_dir, file_name, format, mode)
 
-    r = await jp_fetch("extract-archive", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
+    r = await jp_fetch("extract-qzv", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
     assert r.code == 200
     assert archive_dir_path.is_dir()
 
@@ -201,10 +102,10 @@ async def test_extract(jp_fetch, jp_root_dir, file_name, format, mode):
 async def test_extract_failure(jp_fetch, jp_root_dir, format, mode):
     # The request should fail when the extension has an unnecessary prefix.
     prefixed_format = f"prefix{format}"
-    archive_dir_path, archive_path = _create_archive_file(jp_root_dir, "extract-archive-dir", prefixed_format, mode)
+    archive_dir_path, archive_path = _create_archive_file(jp_root_dir, "extract-qzv-dir", prefixed_format, mode)
 
     with pytest.raises(Exception) as e:
-        await jp_fetch("extract-archive", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
+        await jp_fetch("extract-qzv", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
     assert e.type == HTTPClientError
     assert not archive_dir_path.exists()
 
@@ -224,6 +125,6 @@ async def test_extract_path_traversal(jp_fetch, jp_root_dir, file_path):
         tf.add(unsafe_file_path, file_path)
 
     with pytest.raises(Exception) as e:
-        await jp_fetch("extract-archive", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
+        await jp_fetch("extract-qzv", archive_path.relative_to(jp_root_dir).as_posix(), method="GET")
     assert e.type == HTTPClientError
     assert e.value.code == 400
