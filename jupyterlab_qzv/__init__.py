@@ -18,7 +18,7 @@ def _jupyter_labextension_paths():
     return [{"src": "labextension", "dest": data["name"]}]
 
 
-class JupyterArchive(Configurable):
+class JupyterLabQzv(Configurable):
     stream_max_buffer_size = Int(help="The max size of tornado IOStream buffer",
                                  config=True)
 
@@ -44,7 +44,7 @@ class JupyterArchive(Configurable):
 
 
 def _jupyter_server_extension_points():
-    return [{"module": "jupyter_archive"}]
+    return [{"module": "jupyterlab_qzv"}]
 
 
 def _load_jupyter_server_extension(server_app):
@@ -55,8 +55,8 @@ def _load_jupyter_server_extension(server_app):
     server_app: jupyterlab.labapp.LabApp
         JupyterLab application instance
     """
-    config = JupyterArchive(config=server_app.config)
-    server_app.web_app.settings["jupyter_archive"] = config
+    config = JupyterLabQzv(config=server_app.config)
+    server_app.web_app.settings["jupyterlab_qzv"] = config
     setup_handlers(server_app.web_app)
 
 

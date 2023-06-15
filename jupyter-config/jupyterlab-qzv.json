@@ -1,7 +1,7 @@
 {
   "ServerApp": {
     "jpserver_extensions": {
-      "jupyter_archive": true
+      "jupyterlab_qzv": true
     }
   }
 }

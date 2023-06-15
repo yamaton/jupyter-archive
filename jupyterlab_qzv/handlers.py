@@ -75,7 +75,7 @@ def cleanup_qiime_dir(interval_threshold=10) -> None:
 
 
 
-class ExtractArchiveHandler(APIHandler):
+class ExtractQzvHandler(APIHandler):
     @web.authenticated
     async def get(self, qzv_path):
 
@@ -105,7 +105,7 @@ class ExtractArchiveHandler(APIHandler):
             raise web.HTTPError(500)
 
         cleanup_qiime_dir()
-        await ioloop.IOLoop.current().run_in_executor(None, self.extract_archive, qzv_path)
+        await ioloop.IOLoop.current().run_in_executor(None, self.extract_qzv, qzv_path)
         write_timestamp(uuid_str)
 
         # slash at the tail matters
@@ -113,7 +113,7 @@ class ExtractArchiveHandler(APIHandler):
         self.finish(json.dumps({"data": url}))
 
 
-    def extract_archive(self, archive_path):
+    def extract_qzv(self, archive_path):
         archive_destination = Path.home() / "_qiime"
         archive_destination.mkdir(exist_ok=True)
         self.log.info("Begin extraction of {} to {}.".format(archive_path, archive_destination))
@@ -144,6 +144,6 @@ def setup_handlers(web_app):
     base_url = web_app.settings["base_url"]
 
     handlers = [
-        (url_path_join(base_url, r"/extract-qzv/(.*)"), ExtractArchiveHandler),
+        (url_path_join(base_url, r"/extract-qzv/(.*)"), ExtractQzvHandler),
     ]
     web_app.add_handlers(host_pattern, handlers)

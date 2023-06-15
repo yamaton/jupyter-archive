@@ -1,5 +1,5 @@
 """
-jupyter-archive setup
+jupyterlab-qzv setup
 """
 import json
 import pathlib
@@ -10,7 +10,7 @@ import setuptools
 HERE = pathlib.Path(__file__).parent.resolve()
 
 # The name of the project
-name = "jupyter_archive"
+name = "jupyterlab_qzv"
 
 # Get our version
 with (HERE / "package.json").open() as f:
@@ -25,13 +25,13 @@ jstargets = [
 
 package_data_spec = {name: ["*"]}
 
-labext_name = "@hadim/jupyter-archive"
+labext_name = "@yamaton/jupyterlab-qzv"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
     ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
-    ("etc/jupyter/jupyter_notebook_config.d", "jupyter-config", "jupyter-archive-nb.json"),
-    ("etc/jupyter/jupyter_server_config.d", "jupyter-config", "jupyter-archive.json"),
+    ("etc/jupyter/jupyter_notebook_config.d", "jupyter-config", "jupyterlab-qzv-nb.json"),
+    ("etc/jupyter/jupyter_server_config.d", "jupyter-config", "jupyterlab-qzv.json"),
 ]
 
 cmdclass = create_cmdclass("jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec)
@@ -54,8 +54,8 @@ setup_args = dict(
     version=version,
     author="Hadrien Mary, Frederic Collonval",
     author_email="hadrien.mary@gmail.com, fcollonval@gmail.com",
-    url="https://github.com/jupyterlab-contrib/jupyter-archive/",
-    description="A Jupyterlab extension to make, download and extract archive files.",
+    url="https://github.com/yamaton/jupyterlab-qzv/",
+    description="A Jupyterlab extension to view QZV files.",
     long_description=(pathlib.Path(HERE) / "README.md").read_text(),
     long_description_content_type="text/markdown",
     cmdclass=cmdclass,

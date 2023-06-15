@@ -28,9 +28,9 @@ jobs:
         jlpm
         jlpm run eslint:check
         python -m pip install .
-        pytest jupyter_archive
+        pytest jupyterlab_qzv
 
-        jupyter server extension list 2>&1 | grep -ie "jupyter_archive.*OK"
+        jupyter server extension list 2>&1 | grep -ie "jupyterlab_qzv.*OK"
 
-        jupyter labextension list 2>&1 | grep -ie "@hadim/jupyter-archive.*OK"
+        jupyter labextension list 2>&1 | grep -ie "@yamaton/jupyterlab-qzv.*OK"
         python -m jupyterlab.browser_check

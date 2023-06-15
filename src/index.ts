@@ -13,7 +13,6 @@ import { unarchiveIcon } from './icon';
 const EXTRACT_QZV_URL = 'extract-qzv';
 const FILE_EXTENSION = '.qzv';
 
-
 namespace CommandIDs {
   export const extractQzv = 'filebrowser:extract-qzv';
 }
@@ -46,25 +45,24 @@ function extractArchiveRequest(path: string): Promise<string> {
 }
 
 /**
- * Initialization data for the jupyter-archive extension.
+ * Initialization data for the jupyterlab-qzv extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: '@hadim/jupyter-archive:archive',
+  id: '@yamaton/jupyterlab-qzv:archive',
   autoStart: true,
   requires: [IFileBrowserFactory],
   optional: [ITranslator],
-  activate,
-}
-
+  activate
+};
 
 async function activate(
   app: JupyterFrontEnd,
   factory: IFileBrowserFactory,
   translator: ITranslator | null
-) {
-  const trans = (translator ?? nullTranslator).load('jupyter_archive');
+): Promise<void> {
+  const trans = (translator ?? nullTranslator).load('jupyterlab_qzv');
 
-  console.log('JupyterLab extension jupyter-archive is activated!');
+  console.log('JupyterLab extension jupyterlab-qzv is activated!');
 
   const { commands } = app;
   const { tracker } = factory;
@@ -100,8 +98,8 @@ async function activate(
               '.' + splitName.splice(splitName.length - 2, 2).join('.');
           }
           visible =
-            allowedArchiveExtensions.indexOf(PathExt.extname(basename)) >=
-            0 || allowedArchiveExtensions.indexOf(lastTwoParts) >= 0;
+            allowedArchiveExtensions.indexOf(PathExt.extname(basename)) >= 0 ||
+            allowedArchiveExtensions.indexOf(lastTwoParts) >= 0;
         }
       }
       return visible;

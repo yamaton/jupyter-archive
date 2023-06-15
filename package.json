@@ -1,15 +1,15 @@
 {
-  "name": "@hadim/jupyter-archive",
+  "name": "@yamaton/jupyterlab-qzv",
   "version": "3.3.4",
-  "description": "A Jupyterlab extension to make, download and extract archive files.",
+  "description": "A Jupyterlab extension to view QZV files.",
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/jupyterlab-contrib/jupyter-archive",
+  "homepage": "https://github.com/yamaton/jupyterlab-qzv",
   "bugs": {
-    "url": "https://github.com/jupyterlab-contrib/jupyter-archive/issues"
+    "url": "https://github.com/yamaton/jupyterlab-qzv/issues"
   },
   "license": "BSD-3-Clause",
   "contributors": [
@@ -33,7 +33,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jupyterlab-contrib/jupyter-archive.git"
+    "url": "https://github.com/yamaton/jupyterlab-qzv.git"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
@@ -44,7 +44,7 @@
     "build:prod": "jlpm run build:lib && jlpm run build:labextension",
     "clean": "jlpm run clean:lib",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
-    "clean:labextension": "rimraf jupyter-archive/labextension",
+    "clean:labextension": "rimraf jupyterlab_qzv/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
@@ -92,10 +92,10 @@
           "pip"
         ],
         "base": {
-          "name": "jupyter-archive"
+          "name": "jupyterlab-qzv"
         }
       }
     },
-    "outputDir": "jupyter_archive/labextension"
+    "outputDir": "jupyterlab_qzv/labextension"
   }
 }

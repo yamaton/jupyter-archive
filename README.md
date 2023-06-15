@@ -23,7 +23,7 @@ Features:
 
 ## Configuration
 
-The server extension has some [configuration settings](https://jupyter-server.readthedocs.io/en/latest/users/configuration.html) -- 
+The server extension has some [configuration settings](https://jupyter-server.readthedocs.io/en/latest/users/configuration.html) --
  the values below are the default one:
 
 ```json5
@@ -90,7 +90,7 @@ pip install -e .
 # Link your development version of the extension with JupyterLab
 jupyter labextension develop . --overwrite
 # Server extension must be manually installed in develop mode
-jupyter server extension enable jupyter_archive
+jupyter server extension enable jupyterlab_qzv
 # Rebuild extension Typescript source after making changes
 jlpm run build
 ```

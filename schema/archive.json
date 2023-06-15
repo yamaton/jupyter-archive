@@ -1,5 +1,5 @@
 {
-  "jupyter.lab.setting-icon": "jupyter-archive:archive",
+  "jupyter.lab.setting-icon": "jupyterlab-qzv:archive",
   "title": "Archive",
   "description": "Archive handler options.",
   "properties": {
