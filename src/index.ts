@@ -11,6 +11,8 @@ import { each } from '@lumino/algorithm';
 import { unarchiveIcon } from './icon';
 
 const EXTRACT_QZV_URL = 'extract-qzv';
+const FILE_EXTENSION = '.qzv';
+
 
 namespace CommandIDs {
   export const extractQzv = 'filebrowser:extract-qzv';
@@ -49,68 +51,70 @@ function extractArchiveRequest(path: string): Promise<string> {
 const extension: JupyterFrontEndPlugin<void> = {
   id: '@hadim/jupyter-archive:archive',
   autoStart: true,
-
   requires: [IFileBrowserFactory],
   optional: [ITranslator],
+  activate,
+}
 
-  activate: (
-    app: JupyterFrontEnd,
-    factory: IFileBrowserFactory,
-    translator: ITranslator | null
-  ) => {
-    const trans = (translator ?? nullTranslator).load('jupyter_archive');
 
-    console.log('JupyterLab extension jupyter-archive is activated!');
+async function activate(
+  app: JupyterFrontEnd,
+  factory: IFileBrowserFactory,
+  translator: ITranslator | null
+) {
+  const trans = (translator ?? nullTranslator).load('jupyter_archive');
 
-    const { commands } = app;
-    const { tracker } = factory;
+  console.log('JupyterLab extension jupyter-archive is activated!');
 
-    const allowedArchiveExtensions = ['.qzv'];
+  const { commands } = app;
+  const { tracker } = factory;
 
-    // matches file filebrowser items
-    const selectorNotDir = '.jp-DirListing-item[data-isdir="false"]';
+  const allowedArchiveExtensions = [FILE_EXTENSION];
 
-    // Add the 'extractArchive' command to the file's menu.
-    commands.addCommand(CommandIDs.extractQzv, {
-      execute: () => {
-        const widget = tracker.currentWidget;
-        if (widget) {
-          each(widget.selectedItems(), item => {
-            const promise = extractArchiveRequest(item.path);
-            promise.then(url => window.open(url, '_blank'));
-          });
-        }
-      },
-      icon: unarchiveIcon,
-      isVisible: () => {
-        const widget = tracker.currentWidget;
-        let visible = false;
-        if (widget) {
-          const firstItem = widget.selectedItems().next();
-          if (firstItem) {
-            const basename = PathExt.basename(firstItem.path);
-            const splitName = basename.split('.');
-            let lastTwoParts = '';
-            if (splitName.length >= 2) {
-              lastTwoParts =
-                '.' + splitName.splice(splitName.length - 2, 2).join('.');
-            }
-            visible =
-              allowedArchiveExtensions.indexOf(PathExt.extname(basename)) >=
-                0 || allowedArchiveExtensions.indexOf(lastTwoParts) >= 0;
+  // matches file filebrowser items
+  const selectorNotDir = '.jp-DirListing-item[data-isdir="false"]';
+
+  // Add the 'extractArchive' command to the file's menu.
+  commands.addCommand(CommandIDs.extractQzv, {
+    execute: () => {
+      const widget = tracker.currentWidget;
+      if (widget) {
+        each(widget.selectedItems(), item => {
+          const promise = extractArchiveRequest(item.path);
+          promise.then(url => window.open(url, '_blank'));
+        });
+      }
+    },
+    icon: unarchiveIcon,
+    isVisible: () => {
+      const widget = tracker.currentWidget;
+      let visible = false;
+      if (widget) {
+        const firstItem = widget.selectedItems().next();
+        if (firstItem) {
+          const basename = PathExt.basename(firstItem.path);
+          const splitName = basename.split('.');
+          let lastTwoParts = '';
+          if (splitName.length >= 2) {
+            lastTwoParts =
+              '.' + splitName.splice(splitName.length - 2, 2).join('.');
           }
+          visible =
+            allowedArchiveExtensions.indexOf(PathExt.extname(basename)) >=
+            0 || allowedArchiveExtensions.indexOf(lastTwoParts) >= 0;
         }
-        return visible;
-      },
-      label: trans.__('View QZV')
-    });
+      }
+      return visible;
+    },
+    label: trans.__('View QZV')
+  });
 
-    app.contextMenu.addItem({
-      command: CommandIDs.extractQzv,
-      selector: selectorNotDir,
-      rank: 10
-    });
-  }
-};
+  // Add to right-click context menu
+  app.contextMenu.addItem({
+    command: CommandIDs.extractQzv,
+    selector: selectorNotDir,
+    rank: 10
+  });
+}
 
 export default extension;
