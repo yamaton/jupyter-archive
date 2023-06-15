@@ -1,6 +1,6 @@
 {
   "name": "@yamaton/jupyterlab-qzv",
-  "version": "3.3.4",
+  "version": "0.1.0",
   "description": "A Jupyterlab extension to view QZV files.",
   "keywords": [
     "jupyter",
