@@ -18,7 +18,6 @@ from tornado import ioloop, web
 QIIME_DIR_NAME = "_qiime"
 QIIME_TIMESTAMP_FILE = "_created"
 
-
 def make_reader(archive_path: Path):
     archive_format = "".join(archive_path.suffixes)
     if archive_format.endswith(".qzv"):
@@ -49,14 +48,15 @@ def write_timestamp(uuid_str: str) -> None:
         print(date, file=f)
 
 
-def prepare_qiime_dir() -> None:
+def prepare_qiime_dir() -> Path:
     root = Path.home() / QIIME_DIR_NAME
     root.mkdir(exist_ok=True)
+    return root
 
 
 def cleanup_qiime_dir(interval_threshold=10) -> None:
     """Remove over-10-day-old directories in ~/_qiime for cleanup"""
-    root = Path.home() / QIIME_DIR_NAME
+    root = prepare_qiime_dir()
     paths = root.glob(f"*/{QIIME_TIMESTAMP_FILE}")
 
     today = datetime.datetime.today()
@@ -109,13 +109,13 @@ class ExtractQzvHandler(APIHandler):
         write_timestamp(uuid_str)
 
         # slash at the tail matters
-        url = f"/user/{hubuser}/shiny/{QIIME_DIR_NAME}/{uuid_str}/data/"
+        service_prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+        url = os.path.join(service_prefix,  f"/shiny/{QIIME_DIR_NAME}/{uuid_str}/data/#")
         self.finish(json.dumps({"data": url}))
 
 
     def extract_qzv(self, archive_path):
-        archive_destination = Path.home() / "_qiime"
-        archive_destination.mkdir(exist_ok=True)
+        archive_destination = prepare_qiime_dir()
         self.log.info("Begin extraction of {} to {}.".format(archive_path, archive_destination))
 
         archive_reader = make_reader(archive_path)
