@@ -110,7 +110,7 @@ class ExtractQzvHandler(APIHandler):
 
         # slash at the tail matters
         service_prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-        url = os.path.join(service_prefix,  f"/shiny/{QIIME_DIR_NAME}/{uuid_str}/data/#")
+        url = os.path.join(service_prefix, f"shiny/{QIIME_DIR_NAME}/{uuid_str}/data/#")
         self.finish(json.dumps({"data": url}))
 
 
